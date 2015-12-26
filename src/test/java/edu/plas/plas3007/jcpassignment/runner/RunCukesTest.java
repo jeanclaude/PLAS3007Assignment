@@ -10,7 +10,7 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(
         features = "src/test/resources/edu/plas/plas3007/jcpassignment/features/",
-        glue = "edu.plas.testautoandci",
+        glue = "edu.plas.plas3007.jcpassignment",
         plugin = {"pretty", "junit:reports/junit.xml", "json:reports/cucumber.json", "html:reports/html-reports"},
         monochrome = true)
 public class RunCukesTest {

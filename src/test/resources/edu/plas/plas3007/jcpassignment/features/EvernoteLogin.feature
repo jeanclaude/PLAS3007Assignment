@@ -1,9 +1,5 @@
-@Login
+@Login @Active
 Feature: Testing Evernote Login
-
-  @Active
-  Scenario: Test getting to login page
-    Given I navigate to "https://www.evernote.com/Login.action"
 
   Scenario: Logging into Evernote with correct credentials
     Given I navigate to "https://www.evernote.com/Login.action"
