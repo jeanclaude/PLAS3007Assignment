@@ -1,4 +1,4 @@
-@Login @Active
+@Login
 Feature: Testing Evernote Login
 
   Scenario: Logging into Evernote with correct credentials

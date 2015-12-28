@@ -1,9 +1,12 @@
 package edu.plas.plas3007.jcpassignment.stepdefinitions;
 
 import cucumber.api.PendingException;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import edu.plas.plas3007.jcpassignment.pageobjectmodels.EvernoteLoginPage;
+import edu.plas.plas3007.jcpassignment.pageobjectmodels.EvernoteMainPage;
 import org.junit.Assert;
 
 /**
@@ -17,9 +20,19 @@ public class EvernoteLoginSteps {
     private static final String invalidPassword="blablabla";
 
     private EvernoteLoginPage evernoteLoginPage = new EvernoteLoginPage();
+    private EvernoteMainPage evernoteMainPage = new EvernoteMainPage();
 
     @When("^I log into Evernote with (.*) credentials$")
-    public void iLogIntoEvernoteWithCorrectCredentials(String credentialsType) throws Throwable {
+    public void iLogIntoEvernote(String credentialsType) throws Throwable {
+        logIntoEvernote(credentialsType);
+    }
+
+    @Given("^I am logged into Evernote$")
+    public void iAmLoggedIntoEvernote() throws Throwable {
+        logIntoEvernote("correct");
+    }
+
+    private void logIntoEvernote(String credentialsType) {
         switch (credentialsType) {
             case "correct":
                 //todo make these customisable
@@ -44,7 +57,7 @@ public class EvernoteLoginSteps {
 
     @Then("^The user is logged in$")
     public void theUserIsLoggedIn() throws Throwable {
-        Assert.assertTrue(evernoteLoginPage.userIsLoggedIn(validUsername));
+        Assert.assertTrue(evernoteMainPage.userIsLoggedIn(validUsername));
     }
 
     @Then("^An error indicating \"(.*?)\" is shown$")
@@ -60,5 +73,10 @@ public class EvernoteLoginSteps {
             default:
                 throw new PendingException("Error type " + errorType + " has not been implemented");
         }
+    }
+
+    @And("^I log out from Evernote$")
+    public void iLogOutFromEvernote() throws Throwable {
+        evernoteMainPage.logoutUser();
     }
 }

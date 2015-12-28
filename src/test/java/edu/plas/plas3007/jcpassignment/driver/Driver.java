@@ -90,7 +90,7 @@ public class Driver {
             }
 
             driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
-            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
             driver.manage().window().maximize();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize Selenium WebDriver!", e);

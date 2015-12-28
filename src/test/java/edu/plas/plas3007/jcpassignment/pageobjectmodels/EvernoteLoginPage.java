@@ -3,6 +3,8 @@ package edu.plas.plas3007.jcpassignment.pageobjectmodels;
 import edu.plas.plas3007.jcpassignment.driver.Driver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Created by jeanclaude.pace on 26/12/2015.
@@ -22,23 +24,9 @@ public class EvernoteLoginPage {
         driver.findElement(By.id("login")).click();
     }
 
-    public String getLoggedInUsername() {
-        driver.findElement(By.cssSelector("div.GOSDSN-CEG.GOSDSN-CPD")).click();
-        return driver.findElement((By.id("gwt-debug-AccountMenu-name"))).getText();
-    }
-
-    public boolean userIsLoggedIn(String username) {
-        System.out.println("Checking whether " + username + " is logged in");
-        String loggedInUsername = getLoggedInUsername();
-        System.out.println("Logged in username is " + loggedInUsername);
-        return loggedInUsername.equalsIgnoreCase(username);
-    }
-
     public String getLoginPageErrorMessage() {
         return driver.findElement(By.cssSelector("div.error-status.FieldState-message.FieldState_error-message")).getText();
     }
-
-
 
 
 }

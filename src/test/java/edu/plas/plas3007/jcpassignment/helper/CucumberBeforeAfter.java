@@ -4,6 +4,8 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import edu.plas.plas3007.jcpassignment.driver.Driver;
+import edu.plas.plas3007.jcpassignment.pageobjectmodels.EvernoteMainPage;
+import edu.plas.plas3007.jcpassignment.stepdefinitions.EvernoteLoginSteps;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -52,22 +54,32 @@ public class CucumberBeforeAfter {
         }
     }
 
-    @Before
+    @Before(value = "@DeleteNotesWhenDone")
     public void deleteAllNotesAfterTests() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                //TODO -- implement logic to remove all created notes
-                System.out.println("Removing all created notes. Still TODO");
-                //Driver.startWebDriver();
+                System.out.println("Removing all created notes.");
+                try {
+                    Driver.startWebDriver();
+                    Driver.getWebDriver().get("https://www.evernote.com/Login.action");
+                    EvernoteLoginSteps evernoteLoginSteps=new EvernoteLoginSteps();
+                    evernoteLoginSteps.iAmLoggedIntoEvernote();
+                    EvernoteMainPage evernoteMainPage = new EvernoteMainPage();
+                    evernoteMainPage.deleteAllNotes();
+                    System.out.println("Note deletion complete");
+                    if (Driver.getWebDriver() != null) {
+                        Driver.getWebDriver().quit();
+                        Driver.nullWebDriver();
+                    }
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
                 //Driver.getWebDriver().get("http://40.127.132.250:8090/course/students.jsp");
                 //new StudentsHomePage().clickOnListLink();
                 //new StudentsListPage().deleteAllStudents();
                 //System.out.println("Student deletion complete");
-                //if (Driver.getWebDriver() != null) {
-                //    Driver.getWebDriver().quit();
-                //    Driver.nullWebDriver();
-                //}
+
             }
         });
     }
