@@ -40,4 +40,14 @@ public class EvernoteNotesCreationSteps {
     public void iCanSeeTheNewNoteListedUnderShortcuts() throws Throwable {
         Assert.assertTrue(evernoteMainPage.noteExistsInShortcutList(TEST_TITLE));
     }
+
+    @When("^I create a new note with a (\\d+)x(\\d+) table inside it$")
+    public void iCreateANewNoteWithAXTableInsideIt(int tableWidth, int tableHeight) throws Throwable {
+        evernoteMainPage.createNewNoteWithTableInsideIt(TEST_TITLE,TEST_DESCRIPTION,tableWidth,tableHeight);
+    }
+
+    @And("^The selected note has a (\\d+)x(\\d+) table inside it$")
+    public void theSelectedNoteHasAXTableInsideIt(int tableWidth, int tableHeight) throws Throwable {
+        Assert.assertTrue(evernoteMainPage.checkNoteHasTableInsideIt(TEST_TITLE,tableWidth,tableHeight));
+    }
 }

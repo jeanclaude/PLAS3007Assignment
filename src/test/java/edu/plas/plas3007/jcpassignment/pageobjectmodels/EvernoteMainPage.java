@@ -22,6 +22,18 @@ public class EvernoteMainPage {
     }
 
     public void createNewNote(String title,String description){
+        createNewNoteWithoutSaving(title,description);
+        saveNewNote();
+    }
+
+    /**
+     * Creates a new note with a title and description without saving. REMOVE FOLLOWING IF NOT LONGER VALID Note that after the method executes the focus is left
+     * in the description field.  The caller is hence required to switch to the default context (using driver.switchTo().defaultContent())
+     * unless it wants to write into the description field
+     * @param title
+     * @param description
+     */
+    private void createNewNoteWithoutSaving(String title,String description){
         waitForPageToLoadCompletely();
         driver.findElement(By.id("gwt-debug-Sidebar-newNoteButton")).click();
         waitForPageToLoadCompletely();
@@ -35,10 +47,20 @@ public class EvernoteMainPage {
         //driver.findElement(By.id("gwt-debug-NoteTitleView-textBox")).sendKeys(description);
         //driver.findElement(By.cssSelector("div.GOSDSN-CCD.GOSDSN-CCHB")).sendKeys(description);
         System.out.println("Checkpoint 3");
-
         driver.switchTo().defaultContent();
-        driver.findElement(By.id("gwt-debug-NoteAttributes-doneButton")).click();
+    }
 
+    private void saveNewNote() {
+        driver.findElement(By.id("gwt-debug-NoteAttributes-doneButton")).click();
+    }
+
+    public void createNewNoteWithTableInsideIt(String title,String description,int tableWidth,int tableHeight) {
+        createNewNoteWithoutSaving(title,description);
+        driver.findElement(By.id("gwt-debug-FormattingBar-tableButton")).click();
+        List<WebElement> horizElements = driver.findElements(By.className("GOSDSN-CDN"));
+        List<WebElement> vertElements = horizElements.get(tableWidth-1).findElements(By.className("GOSDSN-CEN"));
+        vertElements.get(tableHeight-1).click();
+        saveNewNote();
     }
 
     private WebElement findNoteInList (String noteTitle) {
@@ -114,6 +136,10 @@ public class EvernoteMainPage {
         //wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-shortcut.qa-shortcutButton"))).click();
     }
 
+    private void selectNote(String noteTitle) {
+        findNoteInList(noteTitle).click();
+    }
+
     private void showShortcutsList() {
         waitForPageToLoadCompletely();
         driver.findElement(By.id("gwt-debug-Sidebar-shortcutsButton-container")).findElement(By.className("GOSDSN-COQ")).click();
@@ -128,5 +154,37 @@ public class EvernoteMainPage {
             }
         }
         return false;
+    }
+
+    /**
+     * Checks whether the note with the given title has a table inside it with the specified width and height
+     * @param noteTitle
+     * @param tableWidth
+     * @param tableHeight
+     * @return True if the note is found to have a table inside it of the correct size. False otherwise
+     */
+    public boolean checkNoteHasTableInsideIt(String noteTitle, int tableWidth, int tableHeight) {
+        selectNote(noteTitle);
+        driver.switchTo().frame("EN_IframePanel_0");
+        WebElement tableElement = driver.findElement(By.tagName("table"));
+        if (tableElement==null) {
+            System.out.println("Table element not found");
+            return false;
+        }
+        List<WebElement> trElements = tableElement.findElements(By.tagName("tr"));
+        if (trElements.size()!=(tableWidth)) {
+            System.out.println("TR list has wrong size: " + trElements.size());
+            return false;
+        }
+        for (WebElement currentTR : trElements) {
+            List<WebElement> tdElements = currentTR.findElements(By.tagName("td"));
+            if (tdElements.size()!=(tableHeight)) {
+                System.out.println("TD list has wrong size: " + tdElements.size());
+                return false;
+            }
+            System.out.println("TD List has correct size");
+        }
+        System.out.println("Table of correct size found!");
+        return true;
     }
 }
