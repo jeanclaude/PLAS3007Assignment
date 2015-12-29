@@ -6,6 +6,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -145,6 +146,11 @@ public class EvernoteMainPage {
         driver.findElement(By.id("gwt-debug-Sidebar-shortcutsButton-container")).findElement(By.className("GOSDSN-COQ")).click();
     }
 
+    private void showNotesList() {
+        waitForPageToLoadCompletely();
+        driver.findElement(By.id("gwt-debug-Sidebar-notesButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+    }
+
     public boolean noteExistsInShortcutList(String noteTitle) {
         showShortcutsList();
         List<WebElement> foundElements = driver.findElements(By.cssSelector("div.GOSDSN-CMVB.GOSDSN-CHD.qa-name"));
@@ -186,5 +192,35 @@ public class EvernoteMainPage {
         }
         System.out.println("Table of correct size found!");
         return true;
+    }
+
+    private void sortNotesList(String sortOrder) {
+        driver.findElement(By.className("focus-NotesView-Subheader-OptionsButton")).click();
+        List<WebElement> sortOptions = driver.findElements(By.className("SelectorOption"));
+        for (WebElement currentOption : sortOptions) {
+            if (currentOption.getText().equals(sortOrder)) {
+                System.out.println("Clicking option to sort by " + sortOrder);
+                currentOption.click();
+                try {
+                    //give the notes list time to refresh
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+    }
+
+    public List<String> getNotesBySortOrder(String sortOrder) {
+        showNotesList();
+        sortNotesList(sortOrder);
+        List<String> returnList = new ArrayList<String>();
+        List<WebElement> foundElements = driver.findElements(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"));
+        for (WebElement current : foundElements) {
+            System.out.println("Adding to list: " + current.getText());
+            returnList.add(current.getText());
+        }
+        return returnList;
     }
 }

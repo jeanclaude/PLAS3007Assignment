@@ -32,7 +32,7 @@ Feature: Testing the creation of new notes
     And I mark it as favourite
     Then I can see the new note listed under shortcuts
 
-  @CreateNotes @DeleteNotesWhenDone
+
   Scenario: Create a new note with a 3x3 table inside it
     Given I navigate to "https://www.evernote.com/Login.action"
     And I am logged into Evernote
@@ -40,3 +40,12 @@ Feature: Testing the creation of new notes
     Then I can see the new note
     And The selected note has a 3x3 table inside it
 
+  @CreateNotes @DeleteNotesWhenDone
+  Scenario: Create 3 notes and ensure that they are sorted correctly
+    Given I navigate to "https://www.evernote.com/Login.action"
+    And I am logged into Evernote
+    When I create some test notes for sorting
+    Then The notes are sorted correctly by "Date Created (oldest first)"
+    And The notes are sorted correctly by "Date Created (newest first)"
+    And The notes are sorted correctly by "Title (ascending)"
+    And The notes are sorted correctly by "Title (descending)"
