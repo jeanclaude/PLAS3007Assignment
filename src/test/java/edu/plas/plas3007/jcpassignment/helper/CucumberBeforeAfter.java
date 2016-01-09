@@ -4,8 +4,10 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import edu.plas.plas3007.jcpassignment.driver.Driver;
+import edu.plas.plas3007.jcpassignment.pageobjectmodels.AndroidContactsPage;
 import edu.plas.plas3007.jcpassignment.pageobjectmodels.EvernoteMainPage;
 import edu.plas.plas3007.jcpassignment.stepdefinitions.EvernoteLoginSteps;
+import edu.plas.plas3007.jcpassignment.stepdefinitions.EvernoteTagsSteps;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -54,6 +56,18 @@ public class CucumberBeforeAfter {
         }
     }
 
+    @After(order = 1000, value = "@DeleteTestTag")
+    public void deleteTestTag() {
+        EvernoteMainPage evernoteMainPage = new EvernoteMainPage();
+        evernoteMainPage.deleteTag(EvernoteTagsSteps.TEST_TAG);
+    }
+
+    @After(order = 100, value = "@DeleteAllNotebooksWhenDone")
+    public void deleteAllNotebooks() {
+        EvernoteMainPage evernoteMainPage = new EvernoteMainPage();
+        evernoteMainPage.deleteAllNotebooksExceptDefault();
+    }
+
     @Before(value = "@DeleteNotesWhenDone")
     public void deleteAllNotesAfterTests() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -75,13 +89,13 @@ public class CucumberBeforeAfter {
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
-                //Driver.getWebDriver().get("http://40.127.132.250:8090/course/students.jsp");
-                //new StudentsHomePage().clickOnListLink();
-                //new StudentsListPage().deleteAllStudents();
-                //System.out.println("Student deletion complete");
-
             }
         });
     }
 
+    @After(value = "@Android")
+    public void deleteAllAndroidContacts() {
+        AndroidContactsPage androidContactsPage = new AndroidContactsPage();
+        androidContactsPage.deleteAllContacts();
+    }
 }

@@ -99,5 +99,12 @@ public class EvernoteNotesCreationSteps {
                 throw new PendingException();
         }
     }
+
+    @When("^I create a note with title \"(.*?)\" and description \"(.*?)\"$")
+    public void iCreateANoteWithTitleAndDescription(String noteName, String noteDescription) throws Throwable {
+        evernoteMainPage.createNewNote(noteName,noteDescription);
+    }
+
+
 }
 

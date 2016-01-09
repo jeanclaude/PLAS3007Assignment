@@ -49,3 +49,6 @@ Feature: Testing the creation of new notes
     And The notes are sorted correctly by "Date Created (newest first)"
     And The notes are sorted correctly by "Title (ascending)"
     And The notes are sorted correctly by "Title (descending)"
+
+
+

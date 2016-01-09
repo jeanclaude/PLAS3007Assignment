@@ -1,8 +1,10 @@
 package edu.plas.plas3007.jcpassignment.pageobjectmodels;
 
+import edu.plas.plas3007.jcpassignment.domainobjects.Note;
 import edu.plas.plas3007.jcpassignment.driver.Driver;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -17,14 +19,28 @@ public class EvernoteMainPage {
     private WebDriver driver = Driver.getWebDriver();
     private Actions action = new Actions(driver);
 
+    public final String DEFAULT_NOTEBOOK_NAME = "First Notebook";
+
     private void waitForPageToLoadCompletely() {
-        WebDriverWait wait = new WebDriverWait(driver, 30);
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("gwt-debug-NotebookSelectMenu-notebookName"), "Notebook"));
+        //todo Can this be cleaner?
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        WebDriverWait wait = new WebDriverWait(driver, 30);
+//        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("gwt-debug-NotebookSelectMenu-notebookName"), "Notebook"));
     }
 
     public void createNewNote(String title,String description){
         createNewNoteWithoutSaving(title,description);
         saveNewNote();
+    }
+
+    public void createListOfNotes(List<Note> listOfNotes) {
+        for (Note current : listOfNotes) {
+            createNewNote(current.getTitle(), current.getDescription());
+        }
     }
 
     /**
@@ -41,13 +57,10 @@ public class EvernoteMainPage {
 
         driver.findElement(By.id("gwt-debug-NoteTitleView-textBox")).sendKeys(title + Keys.ENTER);
 
-       // wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("div.GOSDSN-CJGB.GOSDSN-COFB")));
         driver.switchTo().frame("entinymce_170_ifr");
 
         driver.findElement(By.id("tinymce")).sendKeys(description);
-        //driver.findElement(By.id("gwt-debug-NoteTitleView-textBox")).sendKeys(description);
-        //driver.findElement(By.cssSelector("div.GOSDSN-CCD.GOSDSN-CCHB")).sendKeys(description);
-        System.out.println("Checkpoint 3");
+
         driver.switchTo().defaultContent();
     }
 
@@ -67,8 +80,9 @@ public class EvernoteMainPage {
     private WebElement findNoteInList (String noteTitle) {
         System.out.println("Searching for title " + noteTitle);
         try {
-            WebDriverWait wait = new WebDriverWait(driver, 10);
-            wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"), noteTitle));
+            //removed below since tests were not working when finding tags. I think we can do without this wait
+            //WebDriverWait wait = new WebDriverWait(driver, 10);
+            //wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"), noteTitle));
             List<WebElement> foundElements = driver.findElements(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"));
             for (WebElement current : foundElements) {
                 if (current.getText().equals(noteTitle)) {
@@ -102,6 +116,24 @@ public class EvernoteMainPage {
             System.out.println("All notes deleted");
         }
 
+    }
+
+    public void deleteNote(String title) {
+        waitForPageToLoadCompletely();
+        Actions actions = new Actions(driver);
+        WebElement itemToHoverOver;
+        List<WebElement> listOfNotes = driver.findElements(By.className("focus-NotesView-Note-innerSnippetContainer"));
+        for (WebElement current : listOfNotes) {
+            String noteName = current.findElement(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title")).getText();
+            if (title.equals(noteName)) {
+                System.out.println("Deleting note " + noteName);
+                actions.moveToElement(current).build().perform();
+                driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")).click();
+                driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm")).click();
+                break;
+            }
+
+        }
     }
 
     private void openAccountMenu() {
@@ -141,14 +173,29 @@ public class EvernoteMainPage {
         findNoteInList(noteTitle).click();
     }
 
-    private void showShortcutsList() {
+    public void showShortcutsList() {
         waitForPageToLoadCompletely();
         driver.findElement(By.id("gwt-debug-Sidebar-shortcutsButton-container")).findElement(By.className("GOSDSN-COQ")).click();
     }
 
-    private void showNotesList() {
+    public void showNotesList() {
         waitForPageToLoadCompletely();
         driver.findElement(By.id("gwt-debug-Sidebar-notesButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+        try { Thread.sleep(1000); } catch (Exception e) {};  //we need to wait for the notes to load
+    }
+
+    public void showNotebooksList() {
+        System.out.println("Going to the notebooks page");
+        showNotesList();
+        driver.findElement(By.id("gwt-debug-Sidebar-notebooksButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+        try { Thread.sleep(1000); } catch (Exception e) {}; //we need to wait for the notes to load
+    }
+
+    public void showTagsList() {
+        System.out.println("Going to the notebooks page");
+        showNotesList();
+        driver.findElement(By.id("gwt-debug-Sidebar-tagsButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+        try { Thread.sleep(1000); } catch (Exception e) {}; //we need to wait for the notes to load
     }
 
     public boolean noteExistsInShortcutList(String noteTitle) {
@@ -212,9 +259,8 @@ public class EvernoteMainPage {
         }
     }
 
-    public List<String> getNotesBySortOrder(String sortOrder) {
-        showNotesList();
-        sortNotesList(sortOrder);
+    public List<String> getNotesInList() {
+        System.out.println("Getting the notes in the current notes list");
         List<String> returnList = new ArrayList<String>();
         List<WebElement> foundElements = driver.findElements(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"));
         for (WebElement current : foundElements) {
@@ -222,5 +268,171 @@ public class EvernoteMainPage {
             returnList.add(current.getText());
         }
         return returnList;
+    }
+
+    public List<String> getNotesBySortOrder(String sortOrder) {
+        showNotesList();
+        sortNotesList(sortOrder);
+        return getNotesInList();
+    }
+
+    public void searchForText(String searchString) {
+        showNotesList(); // this is done to ensure that any current search is cleared
+        driver.findElement(By.id("gwt-debug-Sidebar-searchButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+        driver.findElement(By.id("gwt-debug-searchViewSearchBox")).sendKeys(searchString + Keys.ENTER);
+        waitForPageToLoadCompletely();
+    }
+
+    /**
+     * This method assumes that there is currently a note shown on the page
+     * @return
+     */
+    public String getCurrentNoteTitle() {
+        return driver.findElement(By.id("gwt-debug-NoteTitleView-textBox")).getAttribute("value");
+    }
+
+    public void createNotebook(String notebookName) {
+        showNotebooksList();
+        driver.findElement(By.id("gwt-debug-NotebooksDrawer-createNotebookButton")).click();
+        driver.findElement(By.id("gwt-debug-CreateNotebookDialog-centeredTextBox-textBox")).sendKeys(notebookName + Keys.ENTER);
+    }
+
+    public void deleteAllNotebooksExceptDefault() {
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        showNotebooksList();
+        List<WebElement> notebooksList;
+        //while (((notebooksList = driver.findElements(By.cssSelector("div.GOSDSN-CGQB.GOSDSN-CHD.qa-name")))!=null)
+        //        && notebooksList.size()>1) {
+        while (((notebooksList = driver.findElements(By.cssSelector("div.GOSDSN-CKQB.qa-notebookWidget.dragdrop-draggable.dragdrop-handle")))!=null)
+                && notebooksList.size()>1) {
+            System.out.println("Notebooks list size = " + notebooksList.size());
+            WebElement currentNotebookNode=notebooksList.get(0);
+            String currentNotebookName = currentNotebookNode.findElement(By.cssSelector("div.GOSDSN-CGQB.GOSDSN-CHD.qa-name")).getText();
+            System.out.println("Current notebook title is " + currentNotebookName);
+            if (currentNotebookName.equals(DEFAULT_NOTEBOOK_NAME)) {
+                System.out.println("Selecting second node");
+                currentNotebookNode=notebooksList.get(1);
+                currentNotebookName = currentNotebookNode.findElement(By.cssSelector("div.GOSDSN-CGQB.GOSDSN-CHD.qa-name")).getText();
+            }
+            System.out.println("Current notebook name = " + currentNotebookName);
+            try {
+                action.moveToElement(currentNotebookNode).build().perform();
+                wait.until(ExpectedConditions.elementToBeClickable(currentNotebookNode.findElement(By.cssSelector("div.GOSDSN-CJPB.GOSDSN-CBQB.qa-deleteButton.GOSDSN-CLPB")))).click();
+                //currentNotebookNode.findElement(By.cssSelector("div.GOSDSN-CJPB.GOSDSN-CBQB.qa-deleteButton.GOSDSN-CLPB")).click();
+
+                driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm")).click();
+                //wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("gwt-debug-NotebooksDrawer-title"))));;
+
+            } catch (Exception e) {
+                System.out.println("Element not clickable when trying to delete notebook " + currentNotebookName + " due to " + e.getMessage());
+            }
+            showNotebooksList();
+        }
+    }
+
+    public void setNotebookOfNote(String notebookName) {
+        driver.findElement(By.id("gwt-debug-NotebookSelectMenu-notebookName")).click();
+        List<WebElement> notebookNames = driver.findElements(By.id("div.GOSDSN-CFMB.GOSDSN-CHD.qa-name"));
+        for (WebElement current : notebookNames) {
+            System.out.println("Current notebook from list is " + current.getText());
+            if (current.getText().equals(notebookName)) {
+                System.out.println("It's what I was looking for! Clicking it!");
+                current.click();
+                break;
+            }
+        }
+        try { Thread.sleep(1000); } catch (Exception e) {};  //without this we go too fast
+    }
+
+    public void goToNotebook(String notebookName) {
+        System.out.println("Going to notebook: " + notebookName);
+        showNotebooksList();
+        List<WebElement> notebooksList = driver.findElements(By.cssSelector("div.GOSDSN-CGQB.GOSDSN-CHD.qa-name"));
+        for (WebElement current : notebooksList) {
+            System.out.println("Going through list of notebooks. Current item is " + current.getText());
+            if (current.getText().equals(notebookName)) {
+                System.out.println("Clicking on current notebook name since it is: " + current.getText() );
+                current.click();
+                break;
+            }
+        }
+        try { Thread.sleep(1000); } catch (Exception e) {};  //we have to wait a bit until the list of notes gets refreshed
+    }
+
+    public void goToTrashCan() {
+        System.out.println("Going to trashcan");
+        showNotebooksList();
+        driver.findElement(By.cssSelector("div.GOSDSN-CBD.GOSDSN-CGQB")).click();
+        try { Thread.sleep(1000); } catch (Exception e) {};  //we have to wait a bit until the list of notes gets refreshed
+    }
+
+    public void emptyTrash() {
+        goToTrashCan();
+        driver.findElement(By.cssSelector("button.GOSDSN-CC0B.GOSDSN-CA0B.GOSDSN-CLD")).click();
+        driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm")).click();
+    }
+
+    public void restoreFromTrash(String title) {
+        goToTrashCan();
+
+        Actions actions = new Actions(driver);
+        List<WebElement> listOfNotes = driver.findElements(By.className("focus-NotesView-Note-innerSnippetContainer"));
+        for (WebElement current : listOfNotes) {
+            String noteName = current.findElement(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title")).getText();
+            if (title.equals(noteName)) {
+                actions.moveToElement(current).build().perform();
+                List<WebElement> buttons = current.findElements(By.className("focus-NotesView-Note-hoverButton"));
+                for (WebElement currentButton : buttons) {
+                    if (currentButton.getText().equals("Restore")) {
+                        currentButton.click();
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+    }
+
+    public void tagNote(String noteName, String tagName) {
+        System.out.println("Tagging " + noteName + " with tag " + tagName);
+        showNotesList();
+        selectNote(noteName);
+        try { Thread.sleep(4000); } catch (Exception e) {e.printStackTrace();};  //we have to wait a bit for the field to get focus
+        driver.switchTo().defaultContent();
+        driver.findElement(By.id("gwt-debug-NoteTagsView-tagInputBox")).click();
+        System.out.println("Clicked on text box");
+        try { Thread.sleep(4000); } catch (Exception e) {e.printStackTrace();};  //we have to wait a bit for the field to get focus
+        driver.findElement(By.cssSelector("input.GOSDSN-CCLE.GOSDSN-CDLE.qa-ResizingSuggestLozenge-input")).sendKeys(tagName);
+        driver.findElement(By.cssSelector("input.GOSDSN-CCLE.GOSDSN-CDLE.qa-ResizingSuggestLozenge-input")).sendKeys(Keys.ENTER);
+    }
+
+    public void selectTag(String tagName) {
+        showTagsList();
+        List<WebElement> tagsList = driver.findElements(By.cssSelector("div.focus-drawer-TagsDrawer-TagSelectable-name.qa-name"));
+        for (WebElement current : tagsList) {
+            if (tagName.equals(current.getText())) {
+                System.out.println("Selecting the tag " + tagName);
+                current.click();
+                try { Thread.sleep(1000); } catch (Exception e) {}
+                break;
+            }
+        }
+    }
+
+    public void deleteTag(String tagName) {
+        Actions actions = new Actions(driver);
+        showTagsList();
+        List<WebElement> tagNodes = driver.findElements(By.cssSelector("div.qa-tagWidget.focus-drawer-TagsDrawer-Tag-input-switcher"));
+        for (WebElement currentTagNode : tagNodes) {
+            WebElement currentName = currentTagNode.findElement(By.cssSelector("div.focus-drawer-TagsDrawer-TagSelectable-name.qa-name"));
+            if (tagName.equals(currentName.getText())) {
+                actions.moveToElement(currentName).build().perform();
+                driver.findElement(By.cssSelector("div.focus-drawer-TagsDrawer-TagSelectable-icon.focus-drawer-TagsDrawer-TagSelectable-delete-icon.qa-editButton")).click();
+                driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm")).click();
+                break;
+            }
+        }
+
     }
 }
