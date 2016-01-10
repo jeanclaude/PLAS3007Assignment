@@ -1,3 +1,4 @@
+@AllEvernoteTests
 Feature: Testing the Tags feature of Evernote
 
   @EvernoteTags @DeleteNotesWhenDone @DeleteTestTag

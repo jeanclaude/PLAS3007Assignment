@@ -41,6 +41,7 @@ public class Driver {
         if (driver != null) {
             throw new IllegalStateException("Selenium WebDriver has already been initialised!");
         }
+        System.out.println("Browser parameter = " + browser);
         try {
             switch (browser) {
                 case "localFirefox":

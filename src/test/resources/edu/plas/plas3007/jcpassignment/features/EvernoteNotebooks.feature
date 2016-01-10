@@ -1,3 +1,4 @@
+@AllEvernoteTests
 Feature: Testing the creation and use of notebooks in Evernote
 
 

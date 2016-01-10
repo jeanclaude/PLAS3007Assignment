@@ -68,8 +68,14 @@ public class CucumberBeforeAfter {
         evernoteMainPage.deleteAllNotebooksExceptDefault();
     }
 
-    @Before(value = "@DeleteNotesWhenDone")
+    @After(value = "@DeleteNotesWhenDone")
     public void deleteAllNotesAfterTests() {
+        EvernoteMainPage evernoteMainPage = new EvernoteMainPage();
+        evernoteMainPage.deleteAllNotes();
+    }
+
+//    @Before(value = "@DeleteNotesWhenDone")
+    public void deleteAllNotesAfterAllTestsAreDone() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

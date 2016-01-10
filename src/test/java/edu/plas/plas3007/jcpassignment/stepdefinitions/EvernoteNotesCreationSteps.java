@@ -31,6 +31,7 @@ public class EvernoteNotesCreationSteps {
 
     @Then("^I can see the new note$")
     public void iCanSeeTheNewNote() throws Throwable {
+        evernoteMainPage.showNotesList();
         Assert.assertTrue(evernoteMainPage.noteWithTitleExists(TEST_TITLE));
     }
 

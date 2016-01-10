@@ -28,6 +28,7 @@ public class EvernoteMainPage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        // below doesn't work once you start creating your own notebooks!
 //        WebDriverWait wait = new WebDriverWait(driver, 30);
 //        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("gwt-debug-NotebookSelectMenu-notebookName"), "Notebook"));
     }
@@ -80,9 +81,11 @@ public class EvernoteMainPage {
     private WebElement findNoteInList (String noteTitle) {
         System.out.println("Searching for title " + noteTitle);
         try {
-            //removed below since tests were not working when finding tags. I think we can do without this wait
+            //removed below since tests were not working when finding tags.
             //WebDriverWait wait = new WebDriverWait(driver, 10);
             //wait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"), noteTitle));
+            //alas, replaced it by a Sleep. In an ideal world, we'll have time to change this
+            try { Thread.sleep(1000); } catch (Exception e) {}
             List<WebElement> foundElements = driver.findElements(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"));
             for (WebElement current : foundElements) {
                 if (current.getText().equals(noteTitle)) {
@@ -103,16 +106,19 @@ public class EvernoteMainPage {
     }
 
     public void deleteAllNotes() {
-        waitForPageToLoadCompletely();
+        showNotesList();
         Actions actions = new Actions(driver);
         WebElement itemToHoverOver;
+        WebDriverWait wait = new WebDriverWait(driver, 30);
         try {
             while ((itemToHoverOver = driver.findElement(By.className("focus-NotesView-Note-hoverOverlay"))) != null) {
                 actions.moveToElement(itemToHoverOver).build().perform();
-                driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")).click();
-                driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm")).click();
+                wait.until(ExpectedConditions.elementToBeClickable (driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")))).click();
+                //driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")).click();
+                wait.until((ExpectedConditions.elementToBeClickable(driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm"))))).click();
+                try { Thread.sleep(1000); } catch (Exception e) {} //only required for Chrome -- could optimise to make browser-specific
             }
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             System.out.println("All notes deleted");
         }
 
@@ -157,7 +163,11 @@ public class EvernoteMainPage {
 
     public void logoutUser() {
         openAccountMenu();
+        try { Thread.sleep(3000); } catch (Exception e) {}
         driver.findElement(By.id("gwt-debug-AccountMenu-logout")).findElement(By.cssSelector("div.GOSDSN-CCD.GOSDSN-CGJ.GOSDSN-CM2")).click();
+
+        // if we don't sleep and then try to log in again, Evernote will ask us if we are sure we want to quit
+        // we avoid this added complexity with a little wait
     }
 
     public void markNoteAsFavourite(String noteTitle) {
@@ -176,10 +186,16 @@ public class EvernoteMainPage {
     public void showShortcutsList() {
         waitForPageToLoadCompletely();
         driver.findElement(By.id("gwt-debug-Sidebar-shortcutsButton-container")).findElement(By.className("GOSDSN-COQ")).click();
+        waitForPageToLoadCompletely();
     }
 
     public void showNotesList() {
         waitForPageToLoadCompletely();
+
+        driver.switchTo().defaultContent();
+//        WebDriverWait wait = new WebDriverWait(driver, 30);
+//        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("gwt-debug-Sidebar-notesButton-container")).findElement(By.className("GOSDSN-COQ")))).click();
+
         driver.findElement(By.id("gwt-debug-Sidebar-notesButton-container")).findElement(By.className("GOSDSN-COQ")).click();
         try { Thread.sleep(1000); } catch (Exception e) {};  //we need to wait for the notes to load
     }
@@ -363,7 +379,12 @@ public class EvernoteMainPage {
         System.out.println("Going to trashcan");
         showNotebooksList();
         driver.findElement(By.cssSelector("div.GOSDSN-CBD.GOSDSN-CGQB")).click();
-        try { Thread.sleep(1000); } catch (Exception e) {};  //we have to wait a bit until the list of notes gets refreshed
+
+        try { Thread.sleep(3000); } catch (Exception e) {};  //we have to wait a bit until the list of notes gets refreshed
+        //something like the below would work better. As it is, it still doesn't work well (probably because the first note in the list
+        //changes from "Loading..." before the other ones. However, try to fine-tune when possible
+//        WebDriverWait wait = new WebDriverWait(driver, 30);
+//        wait.until(ExpectedConditions.not(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("div.focus-NotesView-Note-noteTitle.qa-title"),"Loading...")));
     }
 
     public void emptyTrash() {

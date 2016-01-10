@@ -1,6 +1,7 @@
+@AllEvernoteTests
 Feature: Testing the Search facilities of Evernote
 
-
+  @SearchNotes @DeleteNotesWhenDone
   Scenario: Create 3 notes, search by note title and ensure that correct note is shown
     Given I navigate to "https://www.evernote.com/Login.action"
     And I am logged into Evernote
@@ -11,7 +12,7 @@ Feature: Testing the Search facilities of Evernote
     Then I can see the note with title "Happy New Year to all"
 
   @SearchNotes @DeleteNotesWhenDone
-  Scenario: Create 3 notes, search by note title and ensure that correct note is shown
+  Scenario: Create 3 notes, search by part of the body text and ensure that correct note is shown
     Given I navigate to "https://www.evernote.com/Login.action"
     And I am logged into Evernote
     When I create a note with title "Once upon a time" and description "They lived happily ever after"
