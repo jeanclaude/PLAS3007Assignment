@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class Driver {
     private static WebDriver driver = null;
     private static String browser;
-    private static final String SELENIUM_GRID_HUB_URL = "http://localhost:4444/grid/hub";
+    private static final String SELENIUM_GRID_HUB_URL = "http://localhost:4444/wd/hub";
     private static final String CHROME_DRIVER_MAC_PATH = "browserdriver/chrome/chromedriver";
     private static final String CHROME_DRIVER_WINDOWS_PATH = "browserdriver/chrome/chromedriver.exe";
     private static final String IE_DRIVER_WINDOWS_PATH = "browserdriver/ie/IEDriverServer.exe";
