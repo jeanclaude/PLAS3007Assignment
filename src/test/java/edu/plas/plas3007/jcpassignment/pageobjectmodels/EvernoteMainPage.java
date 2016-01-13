@@ -114,7 +114,6 @@ public class EvernoteMainPage {
             while ((itemToHoverOver = driver.findElement(By.className("focus-NotesView-Note-hoverOverlay"))) != null) {
                 actions.moveToElement(itemToHoverOver).build().perform();
                 wait.until(ExpectedConditions.elementToBeClickable (driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")))).click();
-                //driver.findElement(By.cssSelector("div.focus-NotesView-Note-hoverIcon.focus-NotesView-Note-delete.qa-deleteButton")).click();
                 wait.until((ExpectedConditions.elementToBeClickable(driver.findElement(By.id("gwt-debug-ConfirmationDialog-confirm"))))).click();
                 try { Thread.sleep(1000); } catch (Exception e) {} //only required for Chrome -- could optimise to make browser-specific
             }

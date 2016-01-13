@@ -81,7 +81,6 @@ public class AndroidContactsPage {
 
     public void goToFavouritesView() {
         try {Thread.sleep(1000);} catch (Exception e) {}
-        //driver.findElements(By.className("android.widget.ImageView")).get(2).click();
         driver.findElement(By.xpath("//*[@content-desc='Favorites']")).click();
         try {Thread.sleep(1000);} catch (Exception e) {}
     }
