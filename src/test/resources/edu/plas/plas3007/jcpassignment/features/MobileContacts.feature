@@ -9,7 +9,7 @@ Feature: Test the Contacts book on an Android phone
     When I return from the contact to the address book
     Then There is a contact with name "My test contact"
 
-  @Android
+  @Android @AndroidPresentation
   Scenario: Search for contact
     Given I log into the Contacts app
     When I create a new contact with name "John Lennon", mobile number "35679799779", home number "21122112" and email address "johnlennon@beetles.com"
