@@ -32,7 +32,7 @@ Feature: Testing the creation of new notes
     And I mark it as favourite
     Then I can see the new note listed under shortcuts
 
-  @CreateNotes @DeleteNotesWhenDone
+  @CreateNotes @DeleteNotesWhenDone @SeleniumPresentation
   Scenario: Create a new note with a 3x3 table inside it
     Given I navigate to "https://www.evernote.com/Login.action"
     And I am logged into Evernote

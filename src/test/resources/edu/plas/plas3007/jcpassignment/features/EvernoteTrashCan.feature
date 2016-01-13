@@ -1,7 +1,7 @@
 @AllEvernoteTests
 Feature: Testing of the Evernote TrashCan feature
 
-  @TrashCan @DeleteNotesWhenDone
+  @TrashCan @DeleteNotesWhenDone @SeleniumPresentation
   Scenario: Create notes, delete them, check that they are in the trashcan and then empty the trash
     Given I navigate to "https://www.evernote.com/Login.action"
     And I am logged into Evernote
