@@ -35,7 +35,6 @@ public class EvernoteLoginSteps {
     private void logIntoEvernote(String credentialsType) {
         switch (credentialsType) {
             case "correct":
-                //todo make these customisable
                 evernoteLoginPage.populateUsername(validUsername);
                 evernoteLoginPage.populatePassword(validPassword);
                 break;

@@ -92,23 +92,11 @@ public class Driver {
 
                 case "appium":
                     DesiredCapabilities appiumCapability = DesiredCapabilities.android();
-
-                    //automationName : Appium
-                    //newCommandTimeout : 30
-                    // platformName : Android
-                    // platformVersion : 5.1
-                    // deviceReadyTimeout : 30
-
-
                     appiumCapability.setCapability(MobileCapabilityType.BROWSER_NAME, "");
                     appiumCapability.setCapability(MobileCapabilityType.DEVICE_NAME, "Android Emulator");
                     appiumCapability.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-                    //appiumCapability.setCapability(MobileCapabilityType.LAUNCH_TIMEOUT, 30000);
-                    //appiumCapability.setCapability(MobileCapabilityType.APP,"Contacts");
-                    //appiumCapability.setCapability(MobileCapabilityType.APP_PACKAGE,"com.android.contacts.ContactsApplication");
                     appiumCapability.setCapability(MobileCapabilityType.APP_PACKAGE,"com.android.contacts");
                     appiumCapability.setCapability(MobileCapabilityType.APP_ACTIVITY,".DialtactsContactsEntryActivity");
-                    //appiumCapability.setCapability(MobileCapabilityType.APP_ACTIVITY,".activities.PeopleActivity");
                     driver = new AndroidDriver(new URL(APPIUM_DRIVER_PATH),appiumCapability);
                     break;
 
